@@ -20,10 +20,12 @@
  * Change Logs:
  * Date           Author       Notes
  * 2018-08-10     never        the first version
+ * 2018-10-24     never        fix warnings
  */
 
 #include <rtthread.h>
 #include <elog.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "tcpclient.h"
@@ -37,6 +39,8 @@ static rt_thread_t tid2 = RT_NULL;
 #define TC_SWITCH_TX (1 << 2)
 #define TC_SWITCH_RX (1 << 3)
 #define STRCMP(a, R, b) (strcmp((a), (b)) R 0)
+
+void rt_tc_test_deinit(rt_tcpclient_t *thiz);
 
 void rt_tc_rx_cb(void *buff, rt_size_t len)
 {
@@ -80,7 +84,7 @@ void rt_tc_thread1_entry(void *param)
                           0, &e) == RT_EOK)
         {
             rt_event_send(tc_event, TC_EXIT_THREAD);
-            rt_tc_test_deinit(param);
+            rt_tc_test_deinit((rt_tcpclient_t *)param);
             return;
         }
         rt_thread_mdelay(5000);
