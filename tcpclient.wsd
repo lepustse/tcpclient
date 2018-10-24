@@ -1,0 +1,41 @@
+@startuml
+
+actor app
+
+== 准备 ==
+app -> tcpclient: rt_tcpclient_start(hostname, port)
+tcpclient -> tcpclient: pipe create
+tcpclient -> tcpclient: socket create
+tcpclient -> server: tcp connect
+tcpclient -> tcpclient: select(max_fd, read_fds(socket, pipe), ...)
+note right: 以 select 方式，同时探测 pipe，socket 两个数据源通道
+
+app -> tcpclient: rt_tcpclient_attach_rx_cb(thiz, rt_tc_rx_cb)
+note right: 注册回调函数
+
+== 数据收发 ==
+app -> tcpclient: rt_tcpclient_send(thiz, buff, len)
+note right: 往 pipe 写数据
+
+tcpclient -[#green]> tcpclient: read data from pipe
+note right: select 探测到 pipe 可读，然后 tcpclient 读取 pipe
+
+tcpclient -> server: send data to server
+note right: 通过 socket 发送数据到 server
+
+server -> tcpclient: tcpclient recv data
+note left: 通过 socket 发送数据到 tcpclient 
+
+tcpclient -[#blue]> tcpclient: read data from socket
+note right: select 探测到 socket 可读，然后 tcpclient 读取 socket
+
+tcpclient --> app: rt_tc_rx_cb(buff, len)
+note left: app 通过回调函数接收数据
+
+== 关闭 ==
+app -> tcpclient: rt_tcpclient_close(thiz)
+
+tcpclient -> tcpclient: pipe close
+tcpclient -> tcpclient: socket close
+
+@enduml
