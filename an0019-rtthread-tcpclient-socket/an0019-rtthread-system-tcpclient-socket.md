@@ -121,15 +121,15 @@ msh />
 
 下面来详细说明：
 
-1. 调用 `tcpclient_start()` 设置服务器 ip 地址 & 端口号，以及完成 pipe、socket 初始化和 TCP 连接、select 配置等工作
-2. 注册接收回调函数 `rx_callback()`
-3. 调用 `tcpclient_send()` 通过 pipe 发送数据（*图中绿线表示 select 探测到 pipe 可读事件*）
+1. 调用 `rt_tcpclient_start()` 设置服务器 ip 地址 & 端口号，以及完成 pipe、socket 初始化和 TCP 连接、select 配置等工作
+2. 注册接收回调函数 `rt_tc_rx_cb()`
+3. 调用 `rt_tcpclient_send()` 通过 pipe 发送数据（*图中绿线表示 select 探测到 pipe 可读事件*）
 4. *图中绿线表示 select 探测到 pipe 可读事件*， tcpclient 被唤醒并读取 pipe 的数据
 5. tcpclient 通过 socket 发送数据给 server
 6. server 通过 socket 发送数据给 tcpclient
 7. *图中蓝线表示 select 探测到 socket 可读事件* ，tcpclient 被唤醒并读取 socket 的数据
-8. app 通过 `rx_callback()` 获得 tcpclient 读取到的数据
-9. 通信完毕，app 调用 `tcpclient_close()` 关闭 pipe、socket，并清理相关资源
+8. app 通过 `rt_tc_rx_cb()` 获得 tcpclient 读取到的数据
+9. 通信完毕，app 调用 `rt_tcpclient_close()` 关闭 pipe、socket，并清理相关资源
 
 ### tcpclient 代码实现
 
@@ -246,7 +246,7 @@ QEMU 成功启动，下面来介绍代码运行情况。
 
 ![网络助手设置](figures/an0019_server_1.png)
 
-- 在 env 里输入 `ipconfig` 查看本机 ip 地址，详情如下：
+- 在 cmd 命令行输入 `ipconfig` 查看本机 ip 地址，详情如下：
 
 ```
 > ipconfig
@@ -256,11 +256,11 @@ IPv4 Address. . . . . . . . . . . : 192.168.12.53
 ```
 
 
-- 通过 `rt_tcpclient_start()` API 设置服务器 IP 地址和端口号，详情如下：
-
+- example 代码中通过 `rt_tcpclient_start()` API 设置服务器 IP 地址和端口号，详情如下：
 ```
 rt_tcpclient_start("192.168.12.53", 9008);
 ```
+> 注意：这里需要根据自己的环境设置 ip 地址和端口号!!!
 
 - 在 `msh />` 里，输入 `rt_tc_test_init` 详情如下：
 ```
