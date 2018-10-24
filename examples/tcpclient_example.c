@@ -40,9 +40,9 @@ static rt_thread_t tid2 = RT_NULL;
 #define TC_SWITCH_RX (1 << 3)
 #define STRCMP(a, R, b) (strcmp((a), (b)) R 0)
 
-void rt_tc_test_deinit(rt_tcpclient_t *thiz);
+static void rt_tc_test_deinit(rt_tcpclient_t *thiz);
 
-void rt_tc_rx_cb(void *buff, rt_size_t len)
+static void rt_tc_rx_cb(void *buff, rt_size_t len)
 {
     char *recv = RT_NULL;
 
@@ -71,7 +71,7 @@ void rt_tc_rx_cb(void *buff, rt_size_t len)
     free(recv);
 }
 
-void rt_tc_thread1_entry(void *param)
+static void rt_tc_thread1_entry(void *param)
 {
     rt_tcpclient_t *temp = param;
     const char *str = "this is thread1\r\n";
@@ -92,7 +92,7 @@ void rt_tc_thread1_entry(void *param)
     }
 }
 
-void rt_tc_thread2_entry(void *param)
+static void rt_tc_thread2_entry(void *param)
 {
     rt_tcpclient_t *temp = param;
     const char *str = "this is thread2\r\n";
@@ -113,12 +113,12 @@ void rt_tc_thread2_entry(void *param)
     }
 }
 
-void rt_tc_test_deinit(rt_tcpclient_t *thiz)
+static void rt_tc_test_deinit(rt_tcpclient_t *thiz)
 {
     rt_tcpclient_close(thiz);
 }
 
-int rt_tc_test_init(void)
+static int rt_tc_test_init(void)
 {
     rt_tcpclient_t *handle = RT_NULL;
 
